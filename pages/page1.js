@@ -1,6 +1,10 @@
 const extend = require("js-base/core/extend");
 const Button = require('sf-core/ui/button');
 const Page = require("sf-core/ui/page");
+const Router = require("sf-core/ui/router");
+const Color = require('sf-core/ui/color');
+const FlexLayout = require('sf-core/ui/flexlayout');
+const ActivityIndicator = require('sf-core/ui/activityindicator');
 
 const MCS_Helper = require('mcs');
 var MCS = new MCS_Helper();
@@ -8,11 +12,15 @@ var MCS = new MCS_Helper();
 var base64TestImageData = 'iVBORw0KGgoAAAANSUhEUgAAAFkAAABfCAYAAACDUmuyAAAQMElEQVR42u1dC3gTVRYOIIgib2ib';
 
 var loginSuccess = false;
-
+var loadingView;
 const Page1 = extend(Page)(
     function(_super) {
         var self = this;
         _super(self);
+
+
+        loadingView = loadingViewCreator(99999);
+
 
         var button1 = new Button({
             text: 'Login',
@@ -46,15 +54,10 @@ const Page1 = extend(Page)(
         });
 
         var button7 = new Button({
-            text: 'Storage Get Item Test',
+            text: 'Demo App',
+            backgroundColor: Color.GREEN,
             flexGrow: 1,
-            onPress: MCS_STORAGE_GETTER_TEST
-        });
-
-        var button8 = new Button({
-            text: 'Store Item',
-            flexGrow: 1,
-            onPress: MCS_STORE_ITEM
+            onPress: DEMO_APP
         });
 
 
@@ -77,12 +80,15 @@ const Page1 = extend(Page)(
         this.layout.addChild(button5);
         this.layout.addChild(button6);
         this.layout.addChild(button7);
-        this.layout.addChild(button8);
+        this.layout.addChild(loadingView);
+
 
     });
 
 // Gets/sets press event callback for btn
 function MCS_LOGIN() {
+
+    loadingView.visible = true;
 
     MCS.login({
             'username': 'mete',
@@ -90,6 +96,8 @@ function MCS_LOGIN() {
         },
 
         function(err, result) {
+
+            loadingView.visible = false;
 
             if (err) {
                 return alert("LOGIN FAILED.  " + err);
@@ -100,36 +108,36 @@ function MCS_LOGIN() {
 
 
 
-/* // TEST ICIN
-            var options = {
-                'name': 'mete',
-                'id': '12'
-            };
+            /* // TEST ICIN
+                        var options = {
+                            'name': 'mete',
+                            'id': '12'
+                        };
 
 
-            MCS.getAssetByName(options, function(err, result) {
+                        MCS.getAssetByName(options, function(err, result) {
 
-                if (err) {
-                    return alert("LOGIN FAILED.  " + err);
-                }
+                            if (err) {
+                                return alert("LOGIN FAILED.  " + err);
+                            }
 
-                alert('Success ' + result);
-
-
-            });
-
-            MCS.getAssetById(options, function(err, result) {
-
-                if (err) {
-                    return alert("LOGIN FAILED.  " + err);
-                }
-
-                alert('Success ' + result);
+                            alert('Success ' + result);
 
 
-            });
+                        });
 
-*/
+                        MCS.getAssetById(options, function(err, result) {
+
+                            if (err) {
+                                return alert("LOGIN FAILED.  " + err);
+                            }
+
+                            alert('Success ' + result);
+
+
+                        });
+
+            */
         }
 
     );
@@ -139,9 +147,13 @@ function MCS_LOGIN() {
 
 function MCS_SEND_BASIC_ANALYTIC() {
 
+
+
     if (loginSuccess == false) {
         return alert("Login should be made first.");
     }
+
+    loadingView.visible = true;
 
     var optionsAnalytic = {
         'deviceID': '112233',
@@ -151,6 +163,7 @@ function MCS_SEND_BASIC_ANALYTIC() {
 
     MCS.sendBasicEvent(optionsAnalytic, function(err, result) {
 
+        loadingView.visible = false;
 
         if (err) {
             return alert("sendBasicEvent FAILED.  " + err);
@@ -167,6 +180,8 @@ function MCS_SEND_ANALYTIC() {
         return alert("Login should be made first.");
     }
 
+    loadingView.visible = true;
+
     var optionsAnalytic = {
         'deviceID': '112233',
         'sessionID': '112233',
@@ -179,6 +194,7 @@ function MCS_SEND_ANALYTIC() {
 
     MCS.sendAnalytic(optionsAnalytic, function(err, result) {
 
+        loadingView.visible = false;
 
         if (err) {
             return alert("sendAnalytic FAILED.  " + err);
@@ -195,6 +211,8 @@ function MCS_REGISTER() {
         return alert("Login should be made first.");
     }
 
+    loadingView.visible = true;
+
     var optionsRegisterDevice = {
         'packageName': 'io.smartface.mcstest',
         'version': '1.0.0',
@@ -203,6 +221,7 @@ function MCS_REGISTER() {
 
     MCS.registerDeviceToken(optionsRegisterDevice, function(err, result) {
 
+        loadingView.visible = false;
 
         if (err) {
             return alert("registerDeviceToken FAILED.  " + err);
@@ -220,6 +239,8 @@ function MCS_DEREGISTER() {
         return alert("Login should be made first.");
     }
 
+    loadingView.visible = true;
+
     var optionsRegisterDevice = {
         'packageName': 'io.smartface.mcstest',
         'version': '1.0.0',
@@ -228,6 +249,8 @@ function MCS_DEREGISTER() {
     MCS.deregisterDeviceToken(optionsRegisterDevice, function(err, result) {
 
 
+        loadingView.visible = false;
+        
         if (err) {
             return alert("deregisterDeviceToken FAILED.  " + err);
         }
@@ -239,13 +262,17 @@ function MCS_DEREGISTER() {
 
 function MCS_APP_POLICIES() {
 
+
     if (loginSuccess == false) {
         return alert("Login should be made first.");
     }
 
+    loadingView.visible = true;
+
     MCS.getAppPolicies(function(err, result) {
 
-
+        loadingView.visible = false;
+        
         if (err) {
             return alert("registerDeviceToken FAILED.  " + err);
         }
@@ -261,6 +288,8 @@ function MCS_APICALLER_GET() {
     if (loginSuccess == false) {
         return alert("Login should be made first.");
     }
+
+    loadingView.visible = true;
 
     var optionsGetMethod = {
         'apiName': 'weather',
@@ -280,6 +309,8 @@ function MCS_APICALLER_GET() {
     };
     MCS.apiCallerGetMethod(optionsGetMethod, function(err, result) {
 
+        loadingView.visible = false;
+        
         if (err) {
             return alert("sendAnalytic FAILED.  " + err);
         }
@@ -291,108 +322,40 @@ function MCS_APICALLER_GET() {
 
 }
 
-function MCS_STORAGE_GETTER_TEST() {
 
-    if (loginSuccess == false) {
-        return alert("Login should be made first.");
-    }
+function DEMO_APP() {
 
-
-    //----------------------------------------------
-    MCS.getCollectionList(
-
-        function(err, result) { // e array dönüyor. collection name leri
-
-            if (err) {
-                return alert("getCollectionList FAILED.  " + err);
-            }
-
-            var CollectionID = result[0].id;
-
-            //----------------------------------------------
-            MCS.getItemListInCollection(CollectionID,
-
-                function(err, result) { // e array dönüyor. collection name leri
-
-                    if (err) {
-                        return alert("getItemListInCollection FAILED.  " + err);
-                    }
-
-
-
-                    var ItemId = result[0].id;
-
-                    //----------------------------------------------
-                    MCS.getItem({
-                            'collectionId': CollectionID,
-                            'itemId': ItemId
-                        },
-                        function(err, result) { // e array dönüyor. collection name leri
-
-                            if (err) {
-                                return alert("getItem FAILED.  " + err);
-                            }
-
-                            alert(result);
-
-                        }
-                    );
-
-
-                }
-
-            );
-
-
-        }
-    );
+    Router.go('page2', {
+        'MCS': MCS
+    });
 
 }
 
-
-
-function MCS_STORE_ITEM() {
-
-    if (loginSuccess == false) {
-        return alert("Login should be made first.");
+var loadingViewCreator = function(id) {
+    var loadingLayout = new FlexLayout({
+        id: id,
+        backgroundColor: Color.BLACK,
+        alpha: 0.5,
+        visible: false,
+        touchEnabled: true
+    });
+    loadingLayout.positionType = FlexLayout.PositionType.ABSOLUTE;
+    loadingLayout.top = 0;
+    loadingLayout.left = 0;
+    loadingLayout.right = 0;
+    loadingLayout.bottom = 0;
+    var myActivityIndicator = new ActivityIndicator({
+        color: Color.WHITE,
+        backgroundColor: Color.TRANSPARENT,
+        touchEnabled: true
+    });
+    if (Device.deviceOS != "Android") {
+        myActivityIndicator.flexGrow = 1;
     }
-
-    //----------------------------------------------
-    MCS.getCollectionList(
-
-        function(err, result) { // e array dönüyor. collection name leri
-
-            if (err) {
-                return alert("getCollectionList FAILED.  " + err);
-            }
-
-            var CollectionID = result[0].id;
-
-            //----------------------------------------------
-            MCS.storeItem({
-                    'collectionId': CollectionID,
-                    'itemName': 'TestMcs.png',
-                    'base64EncodeData': base64TestImageData,
-                    'contentType': 'image/png'
-                },
-                function(err, result) { // e array dönüyor. collection name leri
-
-                    if (err) {
-                        return alert("storeItem FAILED.  " + err);
-                    }
-
-                    alert(result + " : TestMcs.png");
-
-                }
-            );
-
-
-        }
-    );
-
-}
-
-
+    loadingLayout.addChild(myActivityIndicator);
+    loadingLayout.justifyContent = FlexLayout.JustifyContent.CENTER;
+    return loadingLayout;
+};
 
 
 module && (module.exports = Page1);
